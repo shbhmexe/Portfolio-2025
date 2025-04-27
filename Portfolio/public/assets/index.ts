@@ -22,8 +22,8 @@ const company = {
   shopify: '/1732615135776.jpg',
   starbucks: '/hacktoberfest_logo.jpg',
   tesla: '/1680591532979.jpg',
-  // google: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png',
-  // freelance: '/1732615135776.jpg',
+  google: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png',
+  freelance: '/1732615135776.jpg',
 };
 
 // Project images
