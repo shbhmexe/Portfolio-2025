@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Head -->
+  <path d="M100 20C89 20 80 29 80 40V60H120V40C120 29 111 20 100 20Z" fill="#915EFF" fill-opacity="0.9">
+    <animate attributeName="fill-opacity" values="0.9;0.7;0.9" dur="3s" repeatCount="indefinite" />
+  </path>
+  
+  <!-- Body -->
+  <rect x="60" y="70" width="80" height="60" rx="5" fill="#915EFF" fill-opacity="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.6;0.8" dur="2.5s" repeatCount="indefinite" />
+  </rect>
+  
+  <!-- Eyes -->
+  <rect x="70" y="85" width="20" height="10" rx="5" fill="#050816" stroke="#915EFF" stroke-width="1" />
+  <rect x="110" y="85" width="20" height="10" rx="5" fill="#050816" stroke="#915EFF" stroke-width="1" />
+  
+  <circle cx="80" cy="90" r="3" fill="#915EFF">
+    <animate attributeName="fill-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="120" cy="90" r="3" fill="#915EFF">
+    <animate attributeName="fill-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Mouth -->
+  <path d="M85 110H115" stroke="#050816" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Legs -->
+  <rect x="50" y="140" width="20" height="40" rx="2" fill="#915EFF" fill-opacity="0.8">
+    <animate attributeName="height" values="40;38;40" dur="1.5s" repeatCount="indefinite" />
+  </rect>
+  <rect x="130" y="140" width="20" height="40" rx="2" fill="#915EFF" fill-opacity="0.8">
+    <animate attributeName="height" values="40;38;40" dur="1.5s" repeatCount="indefinite" />
+  </rect>
+  
+  <!-- Arms -->
+  <rect x="30" y="80" width="15" height="40" rx="2" fill="#915EFF" fill-opacity="0.8">
+    <animate attributeName="y" values="80;82;80" dur="2s" repeatCount="indefinite" />
+  </rect>
+  <rect x="155" y="80" width="15" height="40" rx="2" fill="#915EFF" fill-opacity="0.8">
+    <animate attributeName="y" values="80;82;80" dur="2s" repeatCount="indefinite" />
+  </rect>
+  
+  <!-- Glow effect -->
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="5" result="blur" />
+    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+  </filter>
+</svg> 
