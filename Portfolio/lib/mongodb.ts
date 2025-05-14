@@ -11,15 +11,14 @@ declare global {
   var mongoose: Cached | undefined;
 }
 
-// Get MongoDB URI from environment variables and ensure it uses the portfolio database
-const MONGODB_URI = process.env.MONGODB_URI?.replace('portfolio', 'portfolio-dev') || '';
+// Get MongoDB URI from environment variables
+const MONGODB_URI = process.env.MONGODB_URI || '';
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error('Please define the MONGODB_URI environment variable inside .env.local or vercel.json');
 }
 
 let cached = global.mongoose as Cached;
-
 
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
@@ -27,23 +26,36 @@ if (!cached) {
 
 async function connectMongoDB() {
   if (cached.conn) {
+    console.log('Using cached MongoDB connection');
     return cached.conn;
   }
 
   if (!cached.promise) {
+    console.log('Connecting to MongoDB...');
     const opts = {
       bufferCommands: false,
+      // Setting a higher timeout for Vercel deployments
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    try {
+      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+        console.log('MongoDB connected successfully!');
+        return mongoose;
+      });
+    } catch (error) {
+      console.error('MongoDB connection error:', error);
+      cached.promise = null;
+      throw error;
+    }
   }
 
   try {
     cached.conn = await cached.promise;
     return cached.conn;
   } catch (e) {
+    console.error('Error waiting for MongoDB connection:', e);
     cached.promise = null;
     throw e;
   }

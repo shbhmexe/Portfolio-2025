@@ -17,7 +17,7 @@ try {
   
   console.log('Successfully loaded MongoDB modules');
 } catch (error) {
-  console.warn('MongoDB modules not available, using mock implementation');
+  console.warn('MongoDB modules not available, using mock implementation:', error);
   
   // Create mock implementations if imports fail
   interface MessageData {
@@ -29,10 +29,13 @@ try {
   }
 
   Message = {
-    create: async (data: MessageData) => ({ 
-      _id: 'mock-id-' + Date.now(),
-      ...data
-    })
+    create: async (data: MessageData) => {
+      console.log('Using mock Message.create with data:', data);
+      return { 
+        _id: 'mock-id-' + Date.now(),
+        ...data
+      };
+    }
   };
   
   connectMongoDB = async () => {
@@ -58,8 +61,18 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: NextRequest) {
   try {
+    // Log environment for debugging
+    console.log('Environment check - EMAIL_HOST:', process.env.EMAIL_HOST);
+    console.log('Environment check - MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    
     // Connect to MongoDB
-    await connectMongoDB();
+    try {
+      await connectMongoDB();
+      console.log('MongoDB connected successfully in route handler');
+    } catch (dbError) {
+      console.error('MongoDB connection failed in route handler:', dbError);
+      // Continue with fallback behavior
+    }
 
     // Parse request body
     const body = await request.json();
@@ -74,13 +87,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Create message in MongoDB
-    const newMessage = await Message.create({
-      name,
-      email,
-      phone: phone || '',
-      message,
-      status: 'pending'
-    });
+    let newMessage;
+    try {
+      newMessage = await Message.create({
+        name,
+        email,
+        phone: phone || '',
+        message,
+        status: 'pending'
+      });
+      console.log('Message saved to database:', newMessage._id);
+    } catch (saveError) {
+      console.error('Error saving message to database:', saveError);
+      newMessage = { _id: 'error-saving-' + Date.now() };
+    }
 
     // Only attempt email sending if not explicitly disabled
     const disableEmail = process.env.DISABLE_EMAIL_SENDING === 'true';
@@ -104,6 +124,7 @@ export async function POST(request: NextRequest) {
             <small>Message ID: ${newMessage._id}</small>
           `
         });
+        console.log('Admin notification email sent successfully');
       } catch (error: any) {
         console.error("Failed to send admin notification email:", error);
         emailStatus.adminEmail = false;
@@ -122,6 +143,7 @@ export async function POST(request: NextRequest) {
             <p>Best regards,<br/>Shubham Shukla</p>
           `
         });
+        console.log('User confirmation email sent successfully');
       } catch (error: any) {
         console.error("Failed to send user confirmation email:", error);
         emailStatus.userEmail = false;
@@ -129,6 +151,8 @@ export async function POST(request: NextRequest) {
       }
       
       emailStatus.success = emailStatus.adminEmail && emailStatus.userEmail;
+    } else {
+      console.log('Email sending is disabled');
     }
 
     return NextResponse.json({ 
