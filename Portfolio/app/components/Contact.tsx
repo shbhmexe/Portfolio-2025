@@ -120,7 +120,7 @@ const Contact = () => {
           visible: true
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Contact form error:', error);
       // Show detailed network error message
       setSubmitStatus({
