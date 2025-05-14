@@ -6,6 +6,10 @@
       "use": "@vercel/next"
     }
   ],
+  "env": {
+    "MONGODB_URI": "",
+    "DISABLE_EMAIL_SENDING": "true"
+  },
   "routes": [
     {
       "src": "/(.*)",
