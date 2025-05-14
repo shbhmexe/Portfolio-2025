@@ -55,3 +55,5 @@ logs
 **/config/keys.ts
 **/config/secrets.js
 **/config/secrets.ts 
+
+mongodb.ts
