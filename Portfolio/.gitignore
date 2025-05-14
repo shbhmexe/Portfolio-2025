@@ -29,7 +29,7 @@ yarn-error.log*
 
 # vercel
 .vercel
-.vercel.json
+vercel.json
 
 # typescript
 *.tsbuildinfo
@@ -47,4 +47,11 @@ Thumbs.db
 
 # logs
 logs
-*.log 
+*.log
+
+# Sensitive configuration files
+# credentials and API keys
+**/config/keys.js
+**/config/keys.ts
+**/config/secrets.js
+**/config/secrets.ts 

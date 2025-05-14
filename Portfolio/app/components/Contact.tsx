@@ -67,15 +67,34 @@ const Contact = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch('/api/contact', {
+      // Use a full URL with a fallback to relative path
+      // This ensures it works both locally and when deployed
+      const baseUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : '';
+      
+      console.log('Sending request to:', `${baseUrl}/api/contact`);
+      
+      const response = await fetch(`${baseUrl}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
+        // Add cache and credentials options
+        cache: 'no-cache',
+        credentials: 'same-origin'
       });
 
+      console.log('Response status:', response.status);
+
+      // If response is not OK, throw an error with status
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const result = await response.json();
+      console.log('Response data:', result);
 
       if (result.success) {
         // Always show a simple success message
@@ -102,10 +121,11 @@ const Contact = () => {
         });
       }
     } catch (error) {
-      // Show network error message on form
+      console.error('Contact form error:', error);
+      // Show detailed network error message
       setSubmitStatus({
         success: false,
-        message: 'Network error. Please check your connection and try again.',
+        message: `Network error: ${error.message || 'Please check your connection and try again.'}`,
         visible: true
       });
     } finally {
