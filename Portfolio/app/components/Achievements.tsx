@@ -18,11 +18,6 @@ const achievements: Achievement[] = [
     icon: <FaTrophy className="text-yellow-400 text-4xl" />,
   },
   {
-    title: "Google Developer Cloud Memeber",
-    description: "Built and deployed over 10+ web development projects using React.js, Next.js, Tailwind CSS, and Node.js.",
-    icon: <FaTrophy className="text-yellow-400 text-4xl" />,
-  },
-  {
     title: "Aspiring Open Source Contributor",
     description: "Working towards contributing to open-source projects and collaborating with global developer communities.",
     icon: <FaMedal className="text-blue-400 text-4xl" />,

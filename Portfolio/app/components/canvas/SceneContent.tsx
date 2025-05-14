@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,6 +45,46 @@ const ComputerModel = () => {
   );
 };
 
+// Floating coding elements
+const FloatingElements = () => {
+  const groupRef = useRef<THREE.Group>(null);
+  const [time, setTime] = useState(0);
+  
+  useFrame((state, delta) => {
+    setTime((prev) => prev + delta);
+    if (groupRef.current) {
+      groupRef.current.position.y = Math.sin(time * 0.5) * 0.1 + 1.5;
+      groupRef.current.rotation.y = time * 0.2;
+    }
+  });
+  
+  return (
+    <group ref={groupRef}>
+      {/* Create code-like particles floating */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <mesh key={i} position={[
+          Math.sin(i / 8 * Math.PI * 2) * 1.2,
+          Math.cos(i / 8 * Math.PI * 2) * 0.2,
+          Math.cos(i / 8 * Math.PI * 2) * 1.2
+        ]}>
+          <boxGeometry args={[0.1, 0.1, 0.1]} />
+          <meshStandardMaterial 
+            color={i % 2 === 0 ? "#4da6ff" : "#915eff"} 
+            emissive={i % 2 === 0 ? "#4da6ff" : "#915eff"}
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+      ))}
+      
+      {/* Create a few floating rings */}
+      <mesh position={[0, 0.5, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.8, 0.1, 16, 32]} />
+        <meshStandardMaterial color="#915eff" emissive="#915eff" emissiveIntensity={0.2} />
+      </mesh>
+    </group>
+  );
+};
+
 // Main scene content
 const SceneContent = () => {
   return (
@@ -58,12 +98,15 @@ const SceneContent = () => {
         position={[1, 10, 5]}
         intensity={2}
         castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
       />
       <pointLight position={[0, 2, 0]} intensity={1} color="#915eff" />
       
       {/* 3D Elements */}
       <group position={[0, 0, 0]}>
         <ComputerModel />
+        <FloatingElements />
         
         {/* Add a floating text */}
         <Text
@@ -74,6 +117,7 @@ const SceneContent = () => {
           lineHeight={1}
           letterSpacing={0.02}
           textAlign="center"
+          font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
           anchorX="center"
           anchorY="middle"
         >

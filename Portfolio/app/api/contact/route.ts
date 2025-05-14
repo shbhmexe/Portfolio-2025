@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectMongoDB from '../../lib/mongodb';
-import Message from '../../models/Message';
+import connectMongoDB from '@/lib/mongodb';
+import Message from '@/models/Message';
 import nodemailer from 'nodemailer';
 
 // Nodemailer transporter configuration with secure settings
