@@ -40,8 +40,7 @@ const MessageSchema = new mongoose.Schema<IMessage>({
     type: Date, 
     default: Date.now 
   }
-}, {
-  collection: 'contacts'
 });
 
+// Use the default collection name (messages)
 export default mongoose.models.Message || mongoose.model<IMessage>('Message', MessageSchema); 

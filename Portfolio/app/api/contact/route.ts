@@ -54,31 +54,21 @@ try {
   };
 }
 
-// Nodemailer transporter configuration
-console.log('Creating Nodemailer transporter with config:', {
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: Number(process.env.EMAIL_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER ? 'PROVIDED' : 'NOT PROVIDED',
-    pass: process.env.EMAIL_PASS ? 'PROVIDED' : 'NOT PROVIDED'
-  }
-});
-
-// Create transporter with secure settings
+// Create Google-specific SMTP transporter for Gmail
+console.log('Creating Gmail-specific transporter with config');
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: Number(process.env.EMAIL_PORT) || 587,
-  secure: false, // Use TLS
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
   tls: {
-    // Do not fail on invalid certs
     rejectUnauthorized: false
   },
-  debug: true // Enable debug output
+  debug: true
 });
 
 // Verify transporter configuration works
@@ -89,6 +79,17 @@ transporter.verify(function(error, success) {
     console.log('Nodemailer server is ready to take our messages');
   }
 });
+
+const sendEmail = async (options: any) => {
+  try {
+    const info = await transporter.sendMail(options);
+    console.log('Email sent successfully:', info.response);
+    return { success: true, info };
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    return { success: false, error };
+  }
+};
 
 export async function POST(request: NextRequest) {
   console.log('===== CONTACT FORM SUBMISSION STARTED =====');
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
 
     // Create message in MongoDB
     let newMessage;
+    let dbSuccess = false;
     try {
       console.log('Attempting to save message to database...');
       newMessage = await Message.create({
@@ -132,22 +134,31 @@ export async function POST(request: NextRequest) {
         status: 'pending'
       });
       console.log('Message saved to database:', newMessage._id);
+      dbSuccess = true;
     } catch (saveError) {
       console.error('Error saving message to database:', saveError);
       newMessage = { _id: 'error-saving-' + Date.now() };
     }
 
+    // Email sending
+    let emailStatus = { 
+      success: false,
+      adminEmail: false, 
+      userEmail: false, 
+      error: null 
+    };
+
     // Only attempt email sending if not explicitly disabled
     const disableEmail = process.env.DISABLE_EMAIL_SENDING === 'true';
-    let emailStatus = { success: true, adminEmail: true, userEmail: true, error: null };
     
     if (!disableEmail) {
       try {
         console.log('Sending admin notification email to:', process.env.PERSONAL_EMAIL);
-        // Send email notification to admin (you)
-        const adminResult = await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: process.env.PERSONAL_EMAIL, // Your personal email
+        
+        // Send admin notification
+        const adminMailResult = await sendEmail({
+          from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+          to: process.env.PERSONAL_EMAIL,
           subject: `New Contact Form Submission from ${name}`,
           html: `
             <h2>New Message from Portfolio Contact Form</h2>
@@ -160,18 +171,13 @@ export async function POST(request: NextRequest) {
             <small>Message ID: ${newMessage._id}</small>
           `
         });
-        console.log('Admin notification email sent successfully', adminResult);
-      } catch (error: any) {
-        console.error("Failed to send admin notification email:", error);
-        emailStatus.adminEmail = false;
-        emailStatus.error = error.message || 'Unknown error sending admin email';
-      }
-
-      try {
+        
+        emailStatus.adminEmail = adminMailResult.success;
+        
+        // Send confirmation to user
         console.log('Sending confirmation email to user:', email);
-        // Send confirmation email to sender
-        const userResult = await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+        const userMailResult = await sendEmail({
+          from: `"Shubham Shukla" <${process.env.EMAIL_USER}>`,
           to: email,
           subject: 'Message Received - Shubham Shukla Portfolio',
           html: `
@@ -180,22 +186,29 @@ export async function POST(request: NextRequest) {
             <p>Best regards,<br/>Shubham Shukla</p>
           `
         });
-        console.log('User confirmation email sent successfully', userResult);
+        
+        emailStatus.userEmail = userMailResult.success;
+        emailStatus.success = adminMailResult.success && userMailResult.success;
+        
       } catch (error: any) {
-        console.error("Failed to send user confirmation email:", error);
-        emailStatus.userEmail = false;
-        emailStatus.error = error.message || 'Unknown error sending confirmation email';
+        console.error("Email sending error:", error);
+        emailStatus.error = error.message || 'Unknown error sending emails';
       }
-      
-      emailStatus.success = emailStatus.adminEmail && emailStatus.userEmail;
     } else {
       console.log('Email sending is disabled by configuration');
+    }
+
+    // Determine appropriate success message based on email status
+    let userMessage = 'Message sent successfully!';
+    
+    if (dbSuccess && !emailStatus.success) {
+      userMessage = 'Your message has been saved, but there was an issue sending the email notification. We\'ll still see your message and get back to you.';
     }
 
     console.log('===== CONTACT FORM SUBMISSION COMPLETED =====');
     return NextResponse.json({ 
       success: true, 
-      message: 'Message sent successfully!',
+      message: userMessage,
       messageId: newMessage._id,
       emailStatus: disableEmail ? 'disabled' : emailStatus
     }, { status: 200 });

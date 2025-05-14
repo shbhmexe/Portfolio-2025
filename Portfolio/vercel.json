@@ -7,7 +7,7 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "mongodb://shbhmexe:wewewe123@cluster0-shard-00-00.jv9n1.mongodb.net:27017,cluster0-shard-00-01.jv9n1.mongodb.net:27017,cluster0-shard-00-02.jv9n1.mongodb.net:27017/Portfolio?ssl=true&replicaSet=atlas-b7vwz9-shard-0&authSource=admin&retryWrites=true&w=majority",
+    "MONGODB_URI": "mongodb://shbhmexe:wewewe123@cluster0-shard-00-00.jv9n1.mongodb.net:27017,cluster0-shard-00-01.jv9n1.mongodb.net:27017,cluster0-shard-00-02.jv9n1.mongodb.net:27017/test?ssl=true&replicaSet=atlas-b7vwz9-shard-0&authSource=admin&retryWrites=true&w=majority",
     "EMAIL_HOST": "smtp.gmail.com",
     "EMAIL_PORT": "587",
     "EMAIL_USER": "shubhushukla586@gmail.com",
