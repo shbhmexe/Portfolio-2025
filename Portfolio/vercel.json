@@ -1,4 +1,4 @@
 {
-  "buildCommand": "npm install --save-dev typescript && npm run build",
+  "buildCommand": "node build.js",
   "installCommand": "npm install --legacy-peer-deps"
 } 
