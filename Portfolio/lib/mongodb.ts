@@ -11,8 +11,8 @@ declare global {
   var mongoose: Cached | undefined;
 }
 
-// Get MongoDB URI from environment variables
-const MONGODB_URI = process.env.MONGODB_URI || '';
+// Use the connection string directly for reliability
+const MONGODB_URI = "mongodb+srv://shbhm:wwewwewwe123@cluster1.1jhelrw.mongodb.net/portfolio?retryWrites=true&w=majority&appName=Cluster1";
 
 console.log('MongoDB URI defined:', !!MONGODB_URI);
 // Don't log the full URI as it contains sensitive information
@@ -35,18 +35,19 @@ async function connectMongoDB() {
   }
 
   if (!cached.promise) {
-    console.log('Connecting to MongoDB...');
+    console.log('Connecting to MongoDB with direct URI...');
     console.log('MongoDB connection options:', {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      dbName: 'portfolio',
+      serverSelectionTimeoutMS: 30000, // Increased timeout
+      connectTimeoutMS: 30000, // Increased timeout
     });
 
     const opts = {
       bufferCommands: false,
-      // Setting a higher timeout for Vercel deployments
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      dbName: 'portfolio', // Explicitly specify the database name
+      serverSelectionTimeoutMS: 20000, // Increased timeout for better reliability
+      connectTimeoutMS: 20000, // Increased timeout
     };
 
     try {
