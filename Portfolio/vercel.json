@@ -7,8 +7,13 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "",
-    "DISABLE_EMAIL_SENDING": "true"
+    "MONGODB_URI": "mongodb+srv://shbhmexe:wewewe123@cluster0.jv9n1.mongodb.net/?retryWrites=true&w=majority&appName=cluster0",
+    "EMAIL_HOST": "smtp.gmail.com",
+    "EMAIL_PORT": "587",
+    "EMAIL_USER": "shubhushukla586@gmail.com",
+    "EMAIL_PASS": "jpqe bovu seof krzh",
+    "PERSONAL_EMAIL": "shubhushukla586@gmail.com",
+    "DISABLE_EMAIL_SENDING": "false"
   },
   "routes": [
     {

@@ -1,31 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-// Create mocked MongoDB implementation to avoid build errors
-interface MessageData {
-  name: string;
-  email: string;
-  phone?: string;
-  message: string;
-  status: string;
+// Dynamic imports for MongoDB
+let connectMongoDB: any;
+let Message: any;
+
+// Try to import MongoDB and Message model
+try {
+  // Import MongoDB connection
+  const mongodb = require('../../../lib/mongodb');
+  connectMongoDB = mongodb.default;
+  
+  // Import Message model
+  const MessageModel = require('../../../models/Message');
+  Message = MessageModel.default;
+  
+  console.log('Successfully loaded MongoDB modules');
+} catch (error) {
+  console.warn('MongoDB modules not available, using mock implementation');
+  
+  // Create mock implementations if imports fail
+  interface MessageData {
+    name: string;
+    email: string;
+    phone?: string;
+    message: string;
+    status: string;
+  }
+
+  Message = {
+    create: async (data: MessageData) => ({ 
+      _id: 'mock-id-' + Date.now(),
+      ...data
+    })
+  };
+  
+  connectMongoDB = async () => {
+    console.log('Using mock MongoDB connection');
+    return null;
+  };
 }
-
-const mockMessage = {
-  create: async (data: MessageData) => ({ 
-    _id: 'mock-id-' + Date.now(),
-    ...data
-  })
-};
-
-// Mock MongoDB connection
-const mockConnectMongoDB = async () => {
-  console.log('Using mock MongoDB connection');
-  return null;
-};
-
-// Use the real or mock implementations
-const connectMongoDB = mockConnectMongoDB;
-const Message = mockMessage;
 
 // Nodemailer transporter configuration with secure settings
 const transporter = nodemailer.createTransport({
