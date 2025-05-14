@@ -13,7 +13,8 @@
     "EMAIL_USER": "shubhushukla586@gmail.com",
     "EMAIL_PASS": "jpqe bovu seof krzh",
     "PERSONAL_EMAIL": "shubhushukla586@gmail.com",
-    "DISABLE_EMAIL_SENDING": "false"
+    "DISABLE_EMAIL_SENDING": "false",
+    "DEBUG": "true"
   },
   "routes": [
     {

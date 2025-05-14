@@ -14,6 +14,10 @@ declare global {
 // Get MongoDB URI from environment variables
 const MONGODB_URI = process.env.MONGODB_URI || '';
 
+console.log('MongoDB URI defined:', !!MONGODB_URI);
+// Don't log the full URI as it contains sensitive information
+console.log('MongoDB URI pattern match:', MONGODB_URI.includes('mongodb://') || MONGODB_URI.includes('mongodb+srv://'));
+
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local or vercel.json');
 }
@@ -32,6 +36,12 @@ async function connectMongoDB() {
 
   if (!cached.promise) {
     console.log('Connecting to MongoDB...');
+    console.log('MongoDB connection options:', {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    });
+
     const opts = {
       bufferCommands: false,
       // Setting a higher timeout for Vercel deployments
@@ -42,6 +52,8 @@ async function connectMongoDB() {
     try {
       cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
         console.log('MongoDB connected successfully!');
+        console.log('MongoDB connection state:', mongoose.connection.readyState);
+        console.log('MongoDB connected to database:', mongoose.connection.db.databaseName);
         return mongoose;
       });
     } catch (error) {
