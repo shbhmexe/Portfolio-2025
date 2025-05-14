@@ -6,11 +6,6 @@
       "use": "@vercel/next"
     }
   ],
-  "build": {
-    "env": {
-      "NODE_OPTIONS": "--legacy-peer-deps"
-    }
-  },
   "routes": [
     {
       "src": "/(.*)",
