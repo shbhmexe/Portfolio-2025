@@ -198,19 +198,16 @@ export async function POST(request: NextRequest) {
       console.log('Email sending is disabled by configuration');
     }
 
-    // Determine appropriate success message based on email status
-    let userMessage = 'Message sent successfully!';
-    
-    if (dbSuccess && !emailStatus.success) {
-      userMessage = 'Your message has been saved, but there was an issue sending the email notification. We\'ll still see your message and get back to you.';
-    }
+    // Always show a successful message to the user regardless of email status
+    const userMessage = 'Message sent successfully! I will get back to you soon.';
 
     console.log('===== CONTACT FORM SUBMISSION COMPLETED =====');
     return NextResponse.json({ 
       success: true, 
       message: userMessage,
       messageId: newMessage._id,
-      emailStatus: disableEmail ? 'disabled' : emailStatus
+      emailStatus: disableEmail ? 'disabled' : emailStatus,
+      showSecondMessage: false  // Add this flag to control whether to show the second message
     }, { status: 200 });
 
   } catch (error: any) {

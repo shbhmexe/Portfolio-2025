@@ -78,21 +78,12 @@ const Contact = () => {
       const result = await response.json();
 
       if (result.success) {
-        // Show success message on form with email status info
-        let statusMessage = 'Message sent successfully! I will get back to you soon.';
-        
-        // Add email status information if available
-        if (result.emailStatus && result.emailStatus !== 'disabled') {
-          if (!result.emailStatus.success) {
-            statusMessage += ' (Note: Message saved but email notification had an issue)';
-          }
-        }
-        
+        // Always show a simple success message
         setSubmitStatus({
           success: true,
-          message: statusMessage,
+          message: 'Message sent successfully! I will get back to you soon.',
           visible: true,
-          emailStatus: result.emailStatus
+          emailStatus: null // Don't store email status
         });
 
         // Reset form on success
@@ -154,7 +145,7 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Status message with ID for scrolling */}
+        {/* Status message with ID for scrolling - simplified version */}
         {submitStatus?.visible && (
           <div 
             id="status-message"
@@ -170,19 +161,7 @@ const Contact = () => {
             }
             <div>
               <p className="font-medium">{submitStatus.message}</p>
-              
-              {/* Show email status details if needed */}
-              {submitStatus.emailStatus && 
-               submitStatus.emailStatus !== 'disabled' && 
-               !submitStatus.emailStatus.success && (
-                <div className="mt-2 text-sm flex items-start">
-                  <FaInfoCircle className="mr-2 flex-shrink-0 mt-0.5" />
-                  <span>
-                    Your message has been saved, but there was an issue sending the 
-                    email notification. We'll still see your message and get back to you.
-                  </span>
-                </div>
-              )}
+              {/* Removed the second message about email notification issues */}
             </div>
           </div>
         )}
