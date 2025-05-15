@@ -1,6 +1,6 @@
 # Modern 3D Portfolio Website
 
-![Portfolio Preview](/public/pro1.jpg)
+![image](https://github.com/user-attachments/assets/cbd09c58-eae1-4e78-9452-f5db1ccbf13b)
 
 A captivating 3D portfolio website built with cutting-edge web technologies to showcase your skills, projects, and professional experience.
 
