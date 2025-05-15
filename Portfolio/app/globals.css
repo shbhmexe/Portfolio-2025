@@ -29,6 +29,8 @@ html.light-theme {
   font-family: "Poppins", sans-serif;
   scroll-behavior: smooth;
   color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -331,6 +333,7 @@ html.light-theme .black-gradient {
 .timeline-container {
   position: relative;
   padding: 2rem 0;
+  overflow: visible;
 }
 
 .timeline-line {
@@ -341,11 +344,13 @@ html.light-theme .black-gradient {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 1;
 }
 
 .timeline-item {
   position: relative;
   margin-bottom: 4rem;
+  overflow: visible;
 }
 
 .timeline-dot {
@@ -360,6 +365,7 @@ html.light-theme .black-gradient {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 .timeline-icon {
@@ -371,6 +377,8 @@ html.light-theme .black-gradient {
   position: relative;
   width: 45%;
   margin-top: 0.5rem;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  z-index: 5;
 }
 
 .timeline-left {
@@ -566,5 +574,20 @@ html.light-theme .black-gradient {
   /* Better vertical rhythm for stacked elements */
   .gap-5 {
     gap: 1.5rem !important;
+  }
+}
+
+/* Enhanced animation performance */
+.motion-section {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  perspective: 1000px;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-faster {
+    transition-duration: 0.3s !important;
   }
 } 

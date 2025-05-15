@@ -9,6 +9,7 @@ import Tech from './components/Tech';
 import Achievements from './components/Achievements';
 import Contact from './components/Contact';
 import WorkTimeline from './components/WorkTimeline';
+import Footer from './components/Footer';
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,7 @@ const Home = () => {
       <div className="relative z-0">
         <Contact />
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { motion, useAnimation, useInView } from 'framer-motion';
 import { styles } from '../constants/styles';
 import SectionWrapper from './SectionWrapper';
 import { fadeIn, textVariant } from './utils/motion';
@@ -89,64 +89,108 @@ interface ExperienceCardProps {
   index: number;
 }
 
-const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience, index }) => (
-  <div className="timeline-item">
-    {/* Timeline dot */}
-    <div className="timeline-dot" style={{ backgroundColor: experience.iconBg }}>
-      <div className="timeline-icon">
-        {experience.jobIcon}
-      </div>
-    </div>
+const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience, index }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.3 });
+  const controls = useAnimation();
 
-    {/* Timeline content */}
-    <motion.div
-      variants={fadeIn(index % 2 === 0 ? "left" : "right", "spring", index * 0.3, 0.75)}
-      className={`timeline-content neon-border-hover ${index % 2 === 0 ? 'timeline-left' : 'timeline-right'}`}
-    >
-      <div className="bg-tertiary rounded-xl p-6 shadow-xl">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full flex-shrink-0 flex justify-center items-center" style={{ backgroundColor: experience.iconBg }}>
-            <img 
-              src={experience.icon} 
-              alt={experience.company_name} 
-              className="w-8 h-8 object-contain"
-            />
-          </div>
-          <div>
-            <h3 className="text-white text-xl font-bold">{experience.title}</h3>
-            <p className="text-secondary font-medium">{experience.company_name}</p>
-            <p className="text-white-100 text-sm">{experience.date}</p>
-          </div>
+  // Animation variants for scroll in/out effect with increased speed
+  const cardVariants = {
+    hidden: { 
+      opacity: 0, 
+      x: index % 2 === 0 ? -100 : 100 
+    },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        type: "spring",
+        damping: 8,  // Reduced damping for faster animation
+        stiffness: 300, // Increased stiffness for faster animation
+        duration: 0.35 // Reduced duration
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      x: index % 2 === 0 ? -100 : 100,
+      transition: {
+        duration: 0.2 // Reduced exit duration
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    } else {
+      controls.start("exit");
+    }
+  }, [isInView, controls]);
+
+  return (
+    <div className="timeline-item" ref={ref}>
+      {/* Timeline dot */}
+      <div 
+        className={`timeline-dot ${isInView ? 'scale-100' : 'scale-0'} transition-transform duration-300`} 
+        style={{ backgroundColor: experience.iconBg }}
+      >
+        <div className="timeline-icon">
+          {experience.jobIcon}
         </div>
+      </div>
 
-        <ul className="list-disc ml-5 space-y-1.5 mb-4">
-          {experience.points.map((point, pointIndex) => (
-            <li 
-              key={`experience-point-${index}-${pointIndex}`}
-              className="text-white-100 text-sm pl-1">
-              {point}
-            </li>
-          ))}
-        </ul>
-        
-        <div className="pt-3 border-t border-gray-700">
-          <p className="text-secondary text-sm mb-2">Technologies:</p>
-          <div className="flex flex-wrap gap-2">
-            {experience.tech.map((tech, techIndex) => (
-              <span 
-                key={`tech-${index}-${techIndex}`}
-                className="px-2 py-1 bg-black-200 rounded-full text-xs text-white-100">
-                {tech}
-              </span>
+      {/* Timeline content */}
+      <motion.div
+        initial="hidden"
+        animate={controls}
+        variants={cardVariants}
+        className={`timeline-content neon-border-hover motion-section ${index % 2 === 0 ? 'timeline-left' : 'timeline-right'}`}
+      >
+        <div className="bg-tertiary rounded-xl p-6 shadow-xl">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-full flex-shrink-0 flex justify-center items-center" style={{ backgroundColor: experience.iconBg }}>
+              <img 
+                src={experience.icon} 
+                alt={experience.company_name} 
+                className="w-8 h-8 object-contain"
+              />
+            </div>
+            <div>
+              <h3 className="text-white text-xl font-bold">{experience.title}</h3>
+              <p className="text-secondary font-medium">{experience.company_name}</p>
+              <p className="text-white-100 text-sm">{experience.date}</p>
+            </div>
+          </div>
+
+          <ul className="list-disc ml-5 space-y-1.5 mb-4">
+            {experience.points.map((point, pointIndex) => (
+              <li 
+                key={`experience-point-${index}-${pointIndex}`}
+                className="text-white-100 text-sm pl-1">
+                {point}
+              </li>
             ))}
+          </ul>
+          
+          <div className="pt-3 border-t border-gray-700">
+            <p className="text-secondary text-sm mb-2">Technologies:</p>
+            <div className="flex flex-wrap gap-2">
+              {experience.tech.map((tech, techIndex) => (
+                <span 
+                  key={`tech-${index}-${techIndex}`}
+                  className="px-2 py-1 bg-black-200 rounded-full text-xs text-white-100">
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
-  </div>
-);
+      </motion.div>
+    </div>
+  );
+};
 
-const WorkTimeline: React.FC = (  ) => {
+const WorkTimeline: React.FC = () => {
   return (
     <>
       <motion.div variants={textVariant()} className="mb-20">

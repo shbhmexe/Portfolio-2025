@@ -1,12 +1,90 @@
 'use client';
-import { motion } from "framer-motion";
+import { motion, useAnimation, useInView } from "framer-motion";
 import { styles } from "../constants/styles";
 import SplineModel from './canvas/SplineModel';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Hero = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
+  
+  // Add refs and animation controls for scroll animations
+  const titleRef = useRef(null);
+  const titleInView = useInView(titleRef, { once: false, amount: 0.5 });
+  const titleControls = useAnimation();
+  
+  const subTextRef = useRef(null);
+  const subTextInView = useInView(subTextRef, { once: false, amount: 0.5 });
+  const subTextControls = useAnimation();
+  
+  const lineRef = useRef(null);
+  const lineInView = useInView(lineRef, { once: false, amount: 0.5 });
+  const lineControls = useAnimation();
+
+  // Animation variants
+  const titleVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        type: "spring",
+        damping: 8,
+        stiffness: 300,
+        duration: 0.3
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      x: -50,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+  
+  const subTextVariants = {
+    hidden: { opacity: 0, x: -30 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        type: "spring",
+        damping: 8,
+        stiffness: 300,
+        delay: 0.1,
+        duration: 0.3
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      x: -30,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+  
+  const lineVariants = {
+    hidden: { scaleY: 0, opacity: 0 },
+    visible: { 
+      scaleY: 1, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        damping: 6,
+        stiffness: 100,
+        duration: 0.4
+      }
+    },
+    exit: { 
+      scaleY: 0, 
+      opacity: 0,
+      transition: {
+        duration: 0.3
+      }
+    }
+  };
 
   useEffect(() => {
     // Check if device is mobile
@@ -35,24 +113,66 @@ const Hero = () => {
     // Cleanup event listener
     return () => window.removeEventListener('resize', checkMobile);
   }, [isMobile, showBanner]);
+  
+  // Control animations based on viewport visibility
+  useEffect(() => {
+    if (titleInView) {
+      titleControls.start("visible");
+    } else {
+      titleControls.start("exit");
+    }
+  }, [titleInView, titleControls]);
+  
+  useEffect(() => {
+    if (subTextInView) {
+      subTextControls.start("visible");
+    } else {
+      subTextControls.start("exit");
+    }
+  }, [subTextInView, subTextControls]);
+  
+  useEffect(() => {
+    if (lineInView) {
+      lineControls.start("visible");
+    } else {
+      lineControls.start("exit");
+    }
+  }, [lineInView, lineControls]);
 
   return (
     <section className="relative w-full h-screen mx-auto overflow-hidden">
       {/* Text section - smaller and positioned higher */}
       <div className={`${styles.paddingX} absolute inset-0 top-[40px] sm:top-[100px] max-w-7xl mx-auto flex flex-row items-start gap-6 z-50 select-none`}>
-        <div className="flex flex-col justify-center items-center mt-5">
+        <div className="flex flex-col justify-center items-center mt-5" ref={lineRef}>
           <div className="w-5 h-5 rounded-full bg-[#915EFF]" />
-          <div className="w-1 sm:h-44 h-24 violet-gradient" />
+          <motion.div 
+            className="w-1 sm:h-44 h-24 violet-gradient motion-section"
+            initial="hidden"
+            animate={lineControls}
+            variants={lineVariants}
+          />
         </div>
 
         <div className="mt-5">
-          <h1 className={`${styles.heroHeadText} text-white`}>
+          <motion.h1 
+            className={`${styles.heroHeadText} text-white motion-section`}
+            ref={titleRef}
+            initial="hidden"
+            animate={titleControls}
+            variants={titleVariants}
+          >
             Hi, I&apos;m <span className="text-[#915EFF]">Shubham Shukla</span>
-          </h1>
-          <p className={`${styles.heroSubText} mt-4 text-secondary`}>
+          </motion.h1>
+          <motion.p 
+            className={`${styles.heroSubText} mt-4 text-secondary motion-section`}
+            ref={subTextRef}
+            initial="hidden"
+            animate={subTextControls}
+            variants={subTextVariants}
+          >
             I develop beautiful web applications <br className="sm:block hidden" />
             with modern user interfaces and experiences
-          </p>
+          </motion.p>
         </div>
       </div>
 

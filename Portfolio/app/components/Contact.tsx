@@ -1,12 +1,127 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useAnimation, useInView } from "framer-motion";
 import { styles } from "../constants/styles";
 import SectionWrapper from "./SectionWrapper";
-import { slideIn } from "./utils/motion";
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaCheckCircle, FaExclamationCircle, FaInfoCircle } from "react-icons/fa";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+const ContactInfo = ({ icon, text }: { icon: React.ReactNode, text: string }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.3 });
+  const controls = useAnimation();
+
+  const variants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        type: "spring",
+        damping: 8,
+        stiffness: 300,
+        duration: 0.3
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      x: -50,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    } else {
+      controls.start("exit");
+    }
+  }, [isInView, controls]);
+
+  return (
+    <motion.div 
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className="flex items-center gap-4 motion-section"
+    >
+      <span className="text-2xl text-[#915EFF]">{icon}</span>
+      <p className="text-white font-medium">{text}</p>
+    </motion.div>
+  );
+};
+
+const FormField = ({ label, name, type, value, onChange, placeholder, required }: any) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.2 });
+  const controls = useAnimation();
+
+  const variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        damping: 10,
+        stiffness: 200,
+        duration: 0.4
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      y: 30,
+      transition: {
+        duration: 0.25
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    } else {
+      controls.start("exit");
+    }
+  }, [isInView, controls]);
+
+  return (
+    <motion.label 
+      className="flex flex-col motion-section"
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+    >
+      <span className="text-white font-medium mb-3 sm:mb-4">{label}</span>
+      {type === 'textarea' ? (
+        <textarea
+          rows={5}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium resize-none"
+          required={required}
+        />
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
+          required={required}
+        />
+      )}
+    </motion.label>
+  );
+};
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -22,6 +137,67 @@ const Contact = () => {
     visible: boolean;
     emailStatus?: any;
   } | null>(null);
+
+  const titleRef = useRef(null);
+  const titleInView = useInView(titleRef, { once: false, amount: 0.5 });
+  const titleControls = useAnimation();
+
+  const mapRef = useRef(null);
+  const mapInView = useInView(mapRef, { once: false, amount: 0.3 });
+  const mapControls = useAnimation();
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: -30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    },
+    exit: { 
+      opacity: 0, 
+      y: -30,
+      transition: { duration: 0.3, ease: "easeIn" }
+    }
+  };
+
+  const mapVariants = {
+    hidden: { opacity: 0, scale: 0.9, x: 50 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      x: 0,
+      transition: {
+        type: "spring",
+        damping: 15,
+        stiffness: 150,
+        duration: 0.5
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.9,
+      x: 50,
+      transition: {
+        duration: 0.3
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (titleInView) {
+      titleControls.start("visible");
+    } else {
+      titleControls.start("exit");
+    }
+  }, [titleInView, titleControls]);
+
+  useEffect(() => {
+    if (mapInView) {
+      mapControls.start("visible");
+    } else {
+      mapControls.start("exit");
+    }
+  }, [mapInView, mapControls]);
 
   // This effect ensures toast notifications appear even if server is reloaded
   useEffect(() => {
@@ -143,26 +319,22 @@ const Contact = () => {
 
   return (
     <div className="xl:mt-12 flex xl:flex-row flex-col-reverse gap-10 overflow-hidden">
-      <motion.div
-        variants={slideIn("left", "tween", 0.2, 1)}
-        className="flex-[0.75] bg-black-100 p-4 sm:p-8 rounded-2xl contact-form-container"
-      >
-        <p className={styles.sectionSubText}>Get in touch</p>
-        <h3 className={styles.sectionHeadText}>Contact.</h3>
+      <div className="flex-[0.75] bg-black-100 p-4 sm:p-8 rounded-2xl contact-form-container">
+        <motion.div
+          ref={titleRef}
+          initial="hidden"
+          animate={titleControls}
+          variants={titleVariants}
+          className="motion-section"
+        >
+          <p className={styles.sectionSubText}>Get in touch</p>
+          <h3 className={styles.sectionHeadText}>Contact.</h3>
+        </motion.div>
 
         <div className="flex flex-col gap-6 mb-8 sm:mb-12">
-          <div className="flex items-center gap-4">
-            <FaEnvelope className="text-2xl text-[#915EFF]" />
-            <p className="text-white font-medium">shubhushukla586@gmail.com</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <FaPhone className="text-2xl text-[#915EFF]" />
-            <p className="text-white font-medium">80766***12</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <FaMapMarkerAlt className="text-2xl text-[#915EFF]" />
-            <p className="text-white font-medium">New Delhi, India</p>
-          </div>
+          <ContactInfo icon={<FaEnvelope />} text="shubhushukla586@gmail.com" />
+          <ContactInfo icon={<FaPhone />} text="80766***12" />
+          <ContactInfo icon={<FaMapMarkerAlt />} text="New Delhi, India" />
         </div>
 
         {/* Status message with ID for scrolling - simplified version */}
@@ -181,7 +353,6 @@ const Contact = () => {
             }
             <div>
               <p className="font-medium">{submitStatus.message}</p>
-              {/* Removed the second message about email notification issues */}
             </div>
           </div>
         )}
@@ -190,83 +361,104 @@ const Contact = () => {
           onSubmit={handleSubmit}
           className="mt-8 sm:mt-12 flex flex-col gap-6 sm:gap-8"
         >
-          <label className="flex flex-col">
-            <span className="text-white font-medium mb-3 sm:mb-4">Your Name</span>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="What's your name?"
-              className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
-              required
-            />
-          </label>
-          <label className="flex flex-col">
-            <span className="text-white font-medium mb-3 sm:mb-4">Your Email</span>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="What's your email?"
-              className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
-              required
-            />
-          </label>
-          <label className="flex flex-col">
-            <span className="text-white font-medium mb-3 sm:mb-4">Your Phone (Optional)</span>
-            <input
-              type="tel"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="Your phone number"
-              className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
-            />
-          </label>
-          <label className="flex flex-col">
-            <span className="text-white font-medium mb-3 sm:mb-4">Your Message</span>
-            <textarea
-              rows={5}
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              placeholder="What do you want to say?"
-              className="bg-tertiary py-3 sm:py-4 px-4 sm:px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium resize-none"
-              required
-            />
-          </label>
+          <FormField
+            label="Your Name"
+            name="name"
+            type="text"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="What's your name?"
+            required={true}
+          />
+          
+          <FormField
+            label="Your Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="What's your email?"
+            required={true}
+          />
+          
+          <FormField
+            label="Your Phone (Optional)"
+            name="phone"
+            type="tel"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="Your phone number"
+            required={false}
+          />
+          
+          <FormField
+            label="Your Message"
+            name="message"
+            type="textarea"
+            value={form.message}
+            onChange={handleChange}
+            placeholder="What do you want to say?"
+            required={true}
+          />
 
-          <button
-            type="submit"
-            className={`py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md ${
-              loading 
-                ? 'bg-gray-600 cursor-not-allowed' 
-                : 'bg-tertiary shadow-primary hover:bg-[#915EFF] transition-colors'
-            } mt-2`}
-            disabled={loading}
+          <motion.div
+            ref={useRef(null)}
+            initial="hidden"
+            animate={useInView(useRef(null), { once: false, amount: 0.3 }) ? "visible" : "exit"}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                  type: "spring",
+                  damping: 10,
+                  stiffness: 200,
+                  duration: 0.3
+                }
+              },
+              exit: { 
+                opacity: 0, 
+                y: 20,
+                transition: {
+                  duration: 0.2
+                }
+              }
+            }}
+            className="motion-section"
           >
-            {loading ? 'Sending...' : 'Send Message'}
-          </button>
+            <button
+              type="submit"
+              className={`py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md ${
+                loading 
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-tertiary shadow-primary hover:bg-[#915EFF] transition-colors'
+              } mt-2`}
+              disabled={loading}
+            >
+              {loading ? 'Sending...' : 'Send Message'}
+            </button>
+          </motion.div>
         </form>
-      </motion.div>
+      </div>
 
       <motion.div
-        variants={slideIn("right", "tween", 0.2, 1)}
-        className="xl:flex-1 xl:h-auto md:h-[550px] h-[300px]"
+        ref={mapRef}
+        initial="hidden"
+        animate={mapControls}
+        variants={mapVariants}
+        className="xl:flex-1 xl:h-auto md:h-[550px] h-[350px] motion-section"
       >
-        <div className="h-full bg-tertiary rounded-2xl overflow-hidden flex items-center justify-center">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.83922661547!2d77.04417777469498!3d28.527252738388286!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi%2C%20India!5e0!3m2!1sen!2sin!4v1698432603736!5m2!1sen!2sin"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224345.83923192866!2d77.06889754864501!3d28.52758200617607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1623329164628!5m2!1sen!2sin"
+          width="100%"
+          height="100%"
+          style={{ border: 0, borderRadius: '12px' }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="rounded-2xl"
+        ></iframe>
       </motion.div>
 
       <ToastContainer 

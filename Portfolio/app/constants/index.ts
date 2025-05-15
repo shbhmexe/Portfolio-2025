@@ -5,6 +5,13 @@ import {
   projects as projectImages
 } from "../../public/assets";
 
+// Social media links for footer
+export const socialLinks = {
+  github: "https://github.com/shbhmexe",
+  linkedin: "https://www.linkedin.com/in/shubham-sharma",
+  instagram: "https://instagram.com/shbhmexe"
+};
+
 export const navLinks = [
   {
     id: "about",
@@ -223,7 +230,7 @@ const projects = [
     live_demo_link: "https://communion-liard.vercel.app/"
   },
   {
-    name: "Trip Guide",
+    name: "Ai Powered Hiring Platform",
     description:
       "A next-generation hiring platform developed using Next.js, designed to revolutionize the recruitment process. It leverages AI technologies for advanced resume parsing, intelligent job matching based on candidate profiles, and in-depth application analysis. The platform streamlines the hiring workflow for both recruiters and applicants, providing faster, smarter, and more accurate hiring decisions.",
     tags: [

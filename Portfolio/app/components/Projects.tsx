@@ -1,5 +1,6 @@
 'use client';
-import { motion } from "framer-motion";
+import React, { useRef, useEffect } from "react";
+import { motion, useAnimation, useInView } from "framer-motion";
 import { styles } from "../constants/styles";
 import { github } from "../../public/assets/icons";
 import { projects } from "../constants";
@@ -26,8 +27,53 @@ const ProjectCard = ({
   source_code_link: string;
   live_demo_link: string;
 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.2 });
+  const controls = useAnimation();
+
+  const cardVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 50,
+      scale: 0.95
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 10,
+        stiffness: 200,
+        duration: 0.4
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      y: 50,
+      scale: 0.95,
+      transition: {
+        duration: 0.25
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    } else {
+      controls.start("exit");
+    }
+  }, [isInView, controls]);
+
   return (
-    <motion.div variants={fadeIn("up", "spring", index * 0.5, 0.75)}>
+    <motion.div 
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={cardVariants}
+      className="motion-section"
+    >
       <Tilt
         className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full min-h-[500px] flex flex-col"
         tiltMaxAngleX={15}
@@ -79,16 +125,76 @@ const ProjectCard = ({
 };
 
 const Projects = () => {
+  const titleRef = useRef(null);
+  const titleInView = useInView(titleRef, { once: false, amount: 0.5 });
+  const titleControls = useAnimation();
+  
+  const descRef = useRef(null);
+  const descInView = useInView(descRef, { once: false, amount: 0.5 });
+  const descControls = useAnimation();
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut" }
+    },
+    exit: { 
+      opacity: 0, 
+      y: -20,
+      transition: { duration: 0.2, ease: "easeIn" }
+    }
+  };
+
+  const descVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut", delay: 0.1 }
+    },
+    exit: { 
+      opacity: 0, 
+      y: 20,
+      transition: { duration: 0.3, ease: "easeIn" }
+    }
+  };
+
+  useEffect(() => {
+    if (titleInView) {
+      titleControls.start("visible");
+    } else {
+      titleControls.start("exit");
+    }
+  }, [titleInView, titleControls]);
+
+  useEffect(() => {
+    if (descInView) {
+      descControls.start("visible");
+    } else {
+      descControls.start("exit");
+    }
+  }, [descInView, descControls]);
+
   return (
     <>
-      <motion.div variants={textVariant()}>
+      <motion.div 
+        ref={titleRef}
+        initial="hidden"
+        animate={titleControls}
+        variants={titleVariants}
+      >
         <p className={`${styles.sectionSubText} `}>My work</p>
         <h2 className={`${styles.sectionHeadText}`}>Projects.</h2>
       </motion.div>
 
       <div className="w-full flex">
         <motion.p
-          variants={fadeIn("", "", 0.1, 1)}
+          ref={descRef}
+          initial="hidden"
+          animate={descControls}
+          variants={descVariants}
           className="mt-3 text-secondary text-[17px] max-w-3xl leading-[30px]"
         >
           Following projects showcases my skills and experience through
