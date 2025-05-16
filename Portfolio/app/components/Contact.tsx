@@ -404,7 +404,7 @@ const Contact = () => {
           <motion.div
             ref={useRef(null)}
             initial="hidden"
-            animate={useInView(useRef(null), { once: false, amount: 0.3 }) ? "visible" : "exit"}
+            animate="visible"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { 
@@ -416,23 +416,16 @@ const Contact = () => {
                   stiffness: 200,
                   duration: 0.3
                 }
-              },
-              exit: { 
-                opacity: 0, 
-                y: 20,
-                transition: {
-                  duration: 0.2
-                }
               }
             }}
-            className="motion-section"
+            className="motion-section relative z-10"
           >
             <button
               type="submit"
               className={`py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md ${
                 loading 
-                  ? 'bg-gray-600 cursor-not-allowed' 
-                  : 'bg-tertiary shadow-primary hover:bg-[#915EFF] transition-colors'
+                  ? 'bg-gray-600' 
+                  : 'bg-[#915EFF] hover:bg-[#7b4fd8] transition-colors'
               } mt-2`}
               disabled={loading}
             >
